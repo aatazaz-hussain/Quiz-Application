@@ -1,0 +1,3 @@
+E:/BSSE-5B/OOAD/project/Quiz Application/build/CMakeFiles/quiz_server.dir
+E:/BSSE-5B/OOAD/project/Quiz Application/build/CMakeFiles/edit_cache.dir
+E:/BSSE-5B/OOAD/project/Quiz Application/build/CMakeFiles/rebuild_cache.dir

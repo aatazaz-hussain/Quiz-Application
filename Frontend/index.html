@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMaster | Online Learning Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f9f9ff 0%, #f5f0ff 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 4px 12px rgba(149, 77, 230, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #8a2be2;
+        }
+
+        .logo i {
+            color: #ff6bcb;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #666;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #8a2be2;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            background: white;
+            color: #8a2be2;
+            border: 2px solid #8a2be2;
+        }
+
+        .btn-login:hover {
+            background: #8a2be2;
+            color: white;
+        }
+
+        .btn-signup {
+            background: linear-gradient(90deg, #ff6bcb, #8a2be2);
+            color: white;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .hero {
+            padding: 80px 0;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(90deg, #8a2be2, #ff6bcb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #8a2be2, #ff6bcb);
+            color: white;
+            padding: 14px 36px;
+            font-size: 1.1rem;
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-illustration {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(255, 107, 203, 0.1));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .hero-illustration i {
+            font-size: 10rem;
+            color: #8a2be2;
+            opacity: 0.7;
+        }
+
+        .features {
+            padding: 80px 0;
+            background: white;
+            border-radius: 40px 40px 0 0;
+            margin-top: 40px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 50px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.08);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ffeff9, #f1e6ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon i {
+            font-size: 2rem;
+            color: #8a2be2;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .user-types {
+            padding: 80px 0;
+        }
+
+        .user-cards {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .user-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 25px;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.1);
+            border-top: 5px solid;
+        }
+
+        .user-card.student {
+            border-color: #ff6bcb;
+        }
+
+        .user-card.teacher {
+            border-color: #8a2be2;
+        }
+
+        .user-card.admin {
+            border-color: #9370db;
+        }
+
+        .user-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .user-card.student .user-icon {
+            color: #ff6bcb;
+        }
+
+        .user-card.teacher .user-icon {
+            color: #8a2be2;
+        }
+
+        .user-card.admin .user-icon {
+            color: #9370db;
+        }
+
+        footer {
+            background: linear-gradient(90deg, #2d0b5a, #8a2be2);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+            }
+            
+            .auth-buttons {
+                margin-top: 10px;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>QuizMaster</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#">Home</a>
+                    <a href="#">Features</a>
+                    <a href="#">How It Works</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="auth-buttons">
+                    <button class="btn btn-login" onclick="showLogin()">Login</button>
+                    <button class="btn btn-signup" onclick="showSignup()">Sign Up</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Elevate Learning with Interactive Quizzes</h1>
+                    <p>Join thousands of students and teachers in a modern, engaging platform for creating, managing, and taking quizzes. Real-time results, messaging, and notifications included.</p>
+                    <button class="btn btn-primary" onclick="showSignup()">Get Started Free</button>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-illustration">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Powerful Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <h3>Interactive Quizzes</h3>
+                        <p>Create and take engaging quizzes with multiple question types and instant feedback.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Real-time Analytics</h3>
+                        <p>Track performance with detailed results and analytics for students and teachers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>Direct Messaging</h3>
+                        <p>Seamless communication between teachers and students within the platform.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="user-types">
+            <div class="container">
+                <h2 class="section-title">Designed For Everyone</h2>
+                <div class="user-cards">
+                    <div class="user-card student">
+                        <div class="user-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h3>Students</h3>
+                        <p>Take quizzes, view results, receive notifications, and communicate with teachers.</p>
+                        <button class="btn btn-login" style="margin-top:20px;" onclick="showSignup()">Join as Student</button>
+                    </div>
+                    <div class="user-card teacher">
+                        <div class="user-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>Teachers</h3>
+                        <p>Create quizzes, manage classes, track results, and communicate with students.</p>
+                        <button class="btn btn-signup" style="margin-top:20px;" onclick="showSignup()">Join as Teacher</button>
+                    </div>
+                    <div class="user-card admin">
+                        <div class="user-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3>Administrators</h3>
+                        <p>Manage users, monitor platform activity, and ensure smooth operation.</p>
+                        <button class="btn btn-login" style="margin-top:20px;" onclick="showLogin()">Admin Login</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">QuizMaster</div>
+                    <p>Revolutionizing online education through interactive assessments.</p>
+                </div>
+                <div>
+                    <h4>Quick Links</h4>
+                    <p><a href="#" style="color:white;text-decoration:none;">Home</a></p>
+                    <p><a href="#" style="color:white;text-decoration:none;">Features</a></p>
+                    <p><a href="#" style="color:white;text-decoration:none;">Contact</a></p>
+                </div>
+                <div>
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-envelope"></i> support@quizmaster.com</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2024 QuizMaster. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showLogin() {
+            const userType = prompt("Select login type: 1. Student 2. Teacher 3. Admin");
+            if (userType === '1') {
+                window.location.href = 'login.html?type=student';
+            } else if (userType === '2') {
+                window.location.href = 'login.html?type=teacher';
+            } else if (userType === '3') {
+                window.location.href = 'login.html?type=admin';
+            }
+        }
+
+        function showSignup() {
+            const userType = prompt("Sign up as: 1. Student 2. Teacher");
+            if (userType === '1') {
+                window.location.href = 'login.html?type=student';
+            } else if (userType === '2') {
+                window.location.href = 'login.html?type=teacher';
+            }
+        }
+    </script>
+</body>
+</html>

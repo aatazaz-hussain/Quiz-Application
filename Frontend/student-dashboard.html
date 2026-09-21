@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student | QuizMaster</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f5f0ff; }
+        .header { background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(138, 43, 226, 0.1); }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 700; color: #8a2be2; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: #8a2be2; color: white; }
+        .btn-secondary { background: #ff6bcb; color: white; }
+        .container { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 200px; background: white; padding: 20px 0; border-right: 1px solid #f0f0f0; }
+        .nav-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #666; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: #f5f0ff; color: #8a2be2; border-left: 3px solid #8a2be2; }
+        .main-content { flex: 1; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(138, 43, 226, 0.08); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat { text-align: center; padding: 15px; }
+        .stat-number { font-size: 2rem; font-weight: 700; color: #8a2be2; margin: 5px 0; }
+        .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 15px 0; }
+        .action-btn { padding: 12px; background: #f5f0ff; border: 1px solid #e0d6f5; border-radius: 8px; cursor: pointer; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #f5f0ff; color: #666; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; }
+        .available { background: #e6f7ff; color: #1890ff; }
+        .completed { background: #f0ffe6; color: #52c41a; }
+        .expired { background: #fff1f0; color: #ff4d4f; }
+        .quiz-item { padding: 12px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .chat-box { height: 300px; border: 1px solid #e0d6f5; border-radius: 8px; padding: 15px; overflow-y: auto; margin-bottom: 15px; }
+        .message { margin-bottom: 10px; padding: 8px 12px; border-radius: 8px; max-width: 70%; }
+        .sent { background: #f5f0ff; margin-left: auto; }
+        .received { background: #e6f7ff; }
+        .notification-item { padding: 10px; border-bottom: 1px solid #f0f0f0; }
+        .quiz-container { background: white; border-radius: 10px; padding: 20px; }
+        .question { margin-bottom: 20px; padding: 15px; background: #f9f9ff; border-radius: 8px; }
+        .option { padding: 10px; margin: 5px 0; background: white; border: 1px solid #e0d6f5; border-radius: 6px; cursor: pointer; }
+        .option:hover { border-color: #8a2be2; }
+        .timer { background: #ff6bcb; color: white; padding: 8px 15px; border-radius: 20px; font-weight: 600; margin-bottom: 15px; display: inline-block; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 400px; max-width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .close { font-size: 1.5rem; cursor: pointer; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #e0d6f5; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"><i class="fas fa-brain"></i> QuizMaster</div>
+        <div class="user-info">
+            <span id="studentName">Student</span>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="nav-item active" onclick="loadPage('dashboard')"><i class="fas fa-home"></i> Dashboard</div>
+            <div class="nav-item" onclick="loadPage('quizzes')"><i class="fas fa-puzzle-piece"></i> Quizzes</div>
+            <div class="nav-item" onclick="loadPage('results')"><i class="fas fa-chart-bar"></i> Results</div>
+            <div class="nav-item" onclick="loadPage('messages')"><i class="fas fa-comments"></i> Messages</div>
+            <div class="nav-item" onclick="loadPage('notifications')"><i class="fas fa-bell"></i> Notifications</div>
+        </div>
+        
+        <div class="main-content" id="content"></div>
+    </div>
+
+<script>
+let currentPage = 'dashboard';
+let quizAnswers = {};
+let currentQuizId = null;
+let quizQuestions = [];
+
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    const userType = localStorage.getItem('userType');
+    
+    if(!token || userType !== 'student') {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    document.getElementById('studentName').textContent = localStorage.getItem('userName') + ' (Student)';
+    loadDashboard();
+}
+
+async function loadDashboard() {
+    document.getElementById('content').innerHTML = `
+        <div class="card"><h2>Welcome back, ${localStorage.getItem('userName')}!</h2><p>Ready to learn and grow</p></div>
+        <div class="stats">
+    <div class="stat">
+        <div class="stat-number">📘</div>
+        <p>"Learning never exhausts the mind."</p>
+    </div>
+    <div class="stat">
+        <div class="stat-number">🌟</div>
+        <p>"Every quiz is a step toward success."</p>
+    </div>
+    <div class="stat">
+        <div class="stat-number">🎯</div>
+        <p>"Mistakes are proof that you are trying."</p>
+    </div>
+    <div class="stat">
+        <div class="stat-number">🚀</div>
+        <p>"Your future is created by what you learn today."</p>
+    </div>
+</div>
+
+        <div class="card"><h3>Quick Actions</h3>
+            <div class="actions">
+                <div class="action-btn" onclick="loadPage('quizzes')"><i class="fas fa-play"></i> Start Quiz</div>
+                <div class="action-btn" onclick="loadPage('results')"><i class="fas fa-chart-bar"></i> View Results</div>
+                <div class="action-btn" onclick="loadPage('messages')"><i class="fas fa-comments"></i> Messages</div>
+                <div class="action-btn" onclick="loadPage('notifications')"><i class="fas fa-bell"></i> Notifications</div>
+            </div>
+        </div>
+        <div class="card"><h3>Available Quizzes</h3>
+            <div id="availableQuizzes">Loading...</div>
+            <button class="btn btn-primary" style="margin-top:10px; width:100%;" onclick="loadPage('quizzes')">View All</button>
+        </div>
+    `;
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/api/quizzes', {
+            headers: { 'Authorization': token }
+        });
+        
+        if(response.ok) {
+            const quizzes = await response.json();
+            document.getElementById('availableCount').textContent = quizzes.length;
+            
+            const quizzesDiv = document.getElementById('availableQuizzes');
+            if(quizzes.length === 0) {
+                quizzesDiv.innerHTML = '<p>No available quizzes</p>';
+            } else {
+                quizzesDiv.innerHTML = quizzes.slice(0, 3).map(q => 
+                    `<div class="quiz-item">
+                        <div><strong>${q.title}</strong><p>${q.subject || 'General'} • Questions: ${q.questionCount || 0}</p></div>
+                        <span class="badge available">available</span>
+                    </div>`
+                ).join('');
+            }
+        }
+    } catch(error) {
+        console.log('Error loading dashboard:', error);
+    }
+}
+
+async function loadQuizzes() {
+    document.getElementById('content').innerHTML = `
+        <h2>Available Quizzes</h2>
+        <div class="card">
+            <table>
+                <thead><tr><th>Quiz</th><th>Subject</th><th>Duration</th><th>Questions</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="quizzesTableBody">Loading quizzes...</tbody>
+            </table>
+        </div>
+        
+        <h2 style="margin-top:30px;">Completed Quizzes</h2>
+        <div class="card">
+            <table>
+                <thead><tr><th>Quiz</th><th>Subject</th><th>Score</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody id="completedTableBody">Loading...</tbody>
+            </table>
+        </div>
+    `;
+    
+    try {
+        const token = localStorage.getItem('token');
+        
+        const quizzesResponse = await fetch('http://localhost:8080/api/quizzes', {
+            headers: { 'Authorization': token }
+        });
+        
+        const resultsResponse = await fetch('http://localhost:8080/api/results', {
+            headers: { 'Authorization': token }
+        });
+        
+        if(quizzesResponse.ok) {
+            const quizzes = await quizzesResponse.json();
+            const tableBody = document.getElementById('quizzesTableBody');
+            
+            if(quizzes.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6">No quizzes available</td></tr>';
+            } else {
+                tableBody.innerHTML = quizzes.map(q => `
+                    <tr>
+                        <td>${q.title}</td>
+                        <td>${q.subject || 'General'}</td>
+                        <td>${q.timeLimit || 30} min</td>
+                        <td>${q.questionCount || 0}</td>
+                        <td><span class="badge available">available</span></td>
+                        <td><button class="btn btn-primary" onclick="startQuiz(${q.id}, '${q.title.replace(/'/g, "\\'")}')">Start</button></td>
+                    </tr>`).join('');
+            }
+        }
+        
+        if(resultsResponse.ok) {
+            const results = await resultsResponse.json();
+            const completedBody = document.getElementById('completedTableBody');
+            
+            if(results.length === 0) {
+                completedBody.innerHTML = '<tr><td colspan="5">No completed quizzes</td></tr>';
+            } else {
+                completedBody.innerHTML = results.map(r => `
+                    <tr>
+                        <td>${r.quizTitle || 'Quiz ' + r.quizId}</td>
+                        <td>General</td>
+                        <td><strong>${r.totalScore || 0}/${r.maxScore || 100} (${r.percentage || 0}%)</strong></td>
+                        <td>${r.gradedAt || new Date().toISOString().split('T')[0]}</td>
+                        <td><button class="btn" onclick="viewQuizResult(${r.id})">View</button></td>
+                    </tr>`).join('');
+            }
+        }
+    } catch(error) {
+        document.getElementById('quizzesTableBody').innerHTML = '<tr><td colspan="6">Error loading quizzes</td></tr>';
+        document.getElementById('completedTableBody').innerHTML = '<tr><td colspan="5">Error loading results</td></tr>';
+    }
+}
+
+async function loadResults() {
+    document.getElementById('content').innerHTML = `
+        <h2>My Results</h2>
+        <div class="card">
+            <table>
+                <thead><tr><th>Quiz</th><th>Subject</th><th>Score</th><th>Date</th><th>Grade</th></tr></thead>
+                <tbody id="resultsTableBody">Loading results...</tbody>
+            </table>
+        </div>
+        <div class="card" style="margin-top:20px;">
+            <h3>Performance Summary</h3>
+            <p id="summaryText">Loading...</p>
+        </div>
+    `;
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/api/results', {
+            headers: { 'Authorization': token }
+        });
+        
+        if(response.ok) {
+            const results = await response.json();
+            const tableBody = document.getElementById('resultsTableBody');
+            const summaryText = document.getElementById('summaryText');
+            
+            if(results.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="5">No results found</td></tr>';
+                summaryText.innerHTML = 'No quizzes taken yet.';
+                return;
+            }
+            
+            let totalPercentage = 0;
+            tableBody.innerHTML = results.map(r => {
+                const percentage = r.percentage || (r.totalScore && r.maxScore ? Math.round((r.totalScore / r.maxScore) * 100) : 0);
+                totalPercentage += percentage;
+                
+                return `
+                <tr>
+                    <td>${r.quizTitle || 'Quiz ' + r.quizId}</td>
+                    <td>General</td>
+                    <td><strong>${r.totalScore || 0}/${r.maxScore || 100} (${percentage}%)</strong></td>
+                    <td>${r.gradedAt || new Date().toISOString().split('T')[0]}</td>
+                    <td><span class="badge ${percentage >= 80 ? 'completed' : 'available'}">${percentage >= 80 ? 'A' : (percentage >= 60 ? 'B' : 'C')}</span></td>
+                </tr>`;
+            }).join('');
+            
+            const avgScore = results.length > 0 ? Math.round(totalPercentage / results.length) : 0;
+            const highestScore = Math.max(...results.map(r => r.percentage || 0));
+            
+            summaryText.innerHTML = `
+                Average Score: <strong>${avgScore}%</strong><br>
+                Total Quizzes Completed: <strong>${results.length}</strong><br>
+                Highest Score: <strong>${highestScore}%</strong>
+            `;
+        }
+    } catch(error) {
+        document.getElementById('resultsTableBody').innerHTML = '<tr><td colspan="5">Error loading results</td></tr>';
+        document.getElementById('summaryText').innerHTML = 'Error loading performance summary.';
+    }
+}
+async function loadMessages() {
+    document.getElementById('content').innerHTML = `
+        <h2>Messages</h2>
+        <div class="card">
+            <div style="margin-bottom:15px;">
+                <label for="teacherSelect">Select Teacher:</label>
+                <select id="teacherSelect" onchange="loadMessagesForTeacher()" style="padding:8px; border-radius:6px; border:1px solid #e0d6f5; width:100%; margin-top:5px;">
+                    <option value="">Loading teachers...</option>
+                </select>
+            </div>
+            
+            <div class="chat-box" id="chatBox">Select a teacher to view messages...</div>
+            
+            <div class="form-group" style="margin-top:15px;">
+                <input type="text" id="newMsg" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
+                <button class="btn btn-primary" style="margin-top:10px;" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    `;
+    
+    await loadTeachers();
+}
+
+let selectedTeacherId = null;
+
+async function loadTeachers() {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/api/teachers', {
+            headers: { 'Authorization': token }
+        });
+        
+        if(response.ok) {
+            const teachers = await response.json();
+            const select = document.getElementById('teacherSelect');
+            
+            if(teachers.length === 0) {
+                select.innerHTML = '<option value="">No teachers available</option>';
+                return;
+            }
+            
+            select.innerHTML = '<option value="">Select a teacher...</option>' +
+                teachers.map(teacher => 
+                    `<option value="${teacher.id}">${teacher.name} (${teacher.email})</option>`
+                ).join('');
+            
+            // Auto-select first teacher if available
+            if(teachers.length > 0) {
+                selectedTeacherId = teachers[0].id;
+                select.value = selectedTeacherId;
+                await loadMessagesForTeacher();
+            }
+        } else {
+            console.error('Failed to load teachers');
+        }
+    } catch(error) {
+        console.error('Error loading teachers:', error);
+    }
+}
+
+async function loadMessagesForTeacher() {
+    const select = document.getElementById('teacherSelect');
+    const teacherId = select.value;
+    
+    if(!teacherId) {
+        document.getElementById('chatBox').innerHTML = 'Please select a teacher';
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8080/api/messages/conversation?userId=${teacherId}`, {
+            headers: { 'Authorization': token }
+        });
+        
+        if(response.ok) {
+            const messages = await response.json();
+            const chatBox = document.getElementById('chatBox');
+            
+            if(messages.length === 0) {
+                chatBox.innerHTML = '<p>No messages with this teacher yet. Start a conversation!</p>';
+                return;
+            }
+            
+            const userId = localStorage.getItem('userId');
+            chatBox.innerHTML = messages.map(m => {
+                const isSent = m.senderId == userId;
+                const senderName = m.senderName || (isSent ? 'You' : 'Teacher');
+                return `
+                <div class="message ${isSent ? 'sent' : 'received'}">
+                    <strong>${senderName}</strong>
+                    <p>${m.content || ''}</p>
+                    <small>${m.createdAt || 'Recent'}</small>
+                </div>`;
+            }).join('');
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } else {
+            document.getElementById('chatBox').innerHTML = '<p>Error loading conversation</p>';
+        }
+    } catch(error) {
+        console.error('Error loading conversation:', error);
+        document.getElementById('chatBox').innerHTML = '<p>Error loading messages</p>';
+    }
+}
+async function sendMessage() {
+    const input = document.getElementById('newMsg');
+    const message = input.value.trim();
+    
+    if (!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        
+        // SIMPLEST: Just append content as query parameter in URL
+        // This works with req.getQuery() in C++
+        const url = `http://localhost:8080/api/messages/send?content=${encodeURIComponent(message)}`;
+        
+        console.log('Sending to URL:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+                // No Content-Type header needed for URL parameters
+            }
+        });
+        
+        console.log('Response status:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Message response:', result);
+            
+            if (result.success) {
+                input.value = '';
+                // Reload messages
+                loadPage('messages');
+            } else {
+                alert('Failed to send message: ' + (result.message || 'Unknown error'));
+            }
+        } else {
+            const errorText = await response.text();
+            console.error('Server error:', errorText);
+            alert('Failed to send message: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Network error. Please try again.');
+    }
+}
+async function loadNotifications() {
+    document.getElementById('content').innerHTML = `
+        <h2>Notifications</h2>
+        <div class="card">
+            <div id="notificationsList">Loading notifications...</div>
+        </div>
+    `;
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/api/notifications', {
+            headers: { 'Authorization': token }
+        });
+        
+        if(response.ok) {
+            const notifications = await response.json();
+            const list = document.getElementById('notificationsList');
+            
+            if(notifications.length === 0) {
+                list.innerHTML = '<p>No notifications</p>';
+                return;
+            }
+            
+            list.innerHTML = notifications.map(n => `
+                <div class="notification-item">
+                    <p>${n.content}</p>
+                    <small>${n.createdAt || 'Recent'}</small>
+                </div>`).join('');
+        }
+    } catch(error) {
+        document.getElementById('notificationsList').innerHTML = '<p>Error loading notifications</p>';
+    }
+}
+
+function loadPage(page) {
+    currentPage = page;
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[['dashboard','quizzes','results','messages','notifications'].indexOf(page)].classList.add('active');
+    
+    if(page === 'dashboard') loadDashboard();
+    else if(page === 'quizzes') loadQuizzes();
+    else if(page === 'results') loadResults();
+    else if(page === 'messages') loadMessages();
+    else if(page === 'notifications') loadNotifications();
+}
+
+function startTimer(seconds) {
+    let time = seconds;
+    const timer = document.getElementById('timer');
+    const interval = setInterval(() => {
+        const minutes = Math.floor(time / 60);
+        const secs = time % 60;
+        timer.textContent = `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        time--;
+        if(time < 0) {
+            clearInterval(interval);
+            submitQuiz();
+        }
+    }, 1000);
+}
+
+async function startQuiz(quizId, quizTitle) {
+    currentQuizId = quizId;
+    quizAnswers = {};
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:8080/api/quiz-questions?quizId=${quizId}`, {
+            headers: { 'Authorization': token }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch quiz questions. Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        quizQuestions = data.questions || [];
+        
+        if (quizQuestions.length === 0) {
+            alert('No questions available for this quiz');
+            loadPage('quizzes');
+            return;
+        }
+        
+        let questionsHTML = '';
+        quizQuestions.forEach((question, index) => {
+            questionsHTML += `
+                <div class="question" data-question-id="${question.id}">
+                    <h4>Question ${index + 1}: ${question.text}</h4>`;
+            
+            if (question.options && question.options.length > 0) {
+                question.options.forEach((option, optIndex) => {
+                    questionsHTML += `
+                        <div class="option" onclick="selectAnswer(${question.id}, ${optIndex})">
+                            ${String.fromCharCode(65 + optIndex)}. ${option}
+                        </div>`;
+                });
+            } else {
+                questionsHTML += `
+                    <div class="option" onclick="selectAnswer(${question.id}, 0)">A. Option A</div>
+                    <div class="option" onclick="selectAnswer(${question.id}, 1)">B. Option B</div>
+                    <div class="option" onclick="selectAnswer(${question.id}, 2)">C. Option C</div>
+                    <div class="option" onclick="selectAnswer(${question.id}, 3)">D. Option D</div>`;
+            }
+            
+            questionsHTML += `</div>`;
+        });
+        
+        document.getElementById('content').innerHTML = `
+            <div class="quiz-container">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>${quizTitle}</h2>
+                    <div class="timer" id="timer">30:00</div>
+                </div>
+                <p>Subject: General | Duration: 30 min</p>
+                
+                <div id="questionsContainer">
+                    ${questionsHTML}
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn" onclick="loadPage('quizzes')">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitQuiz()">Submit Quiz</button>
+                </div>
+            </div>
+        `;
+        
+        startTimer(1800);
+    } catch (error) {
+        console.error('Error loading quiz:', error);
+        alert('Failed to load quiz. Please try again.');
+        loadPage('quizzes');
+    }
+}
+
+function selectAnswer(questionId, optionIndex) {
+    quizAnswers[questionId] = optionIndex;
+    
+    const questionDiv = document.querySelector(`.question[data-question-id="${questionId}"]`);
+    const options = questionDiv.querySelectorAll('.option');
+    
+    options.forEach(opt => {
+        opt.style.background = 'white';
+        opt.style.borderColor = '#e0d6f5';
+    });
+    
+    if (options[optionIndex]) {
+        options[optionIndex].style.background = '#f5f0ff';
+        options[optionIndex].style.borderColor = '#8a2be2';
+    }
+}
+
+async function submitQuiz() {
+    if (!currentQuizId) {
+        alert('No quiz selected');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        
+        // Convert answers to URL-safe format
+        const answersStr = encodeURIComponent(JSON.stringify(quizAnswers));
+        
+        // Send as URL parameters
+        const url = `http://localhost:8080/api/submit-quiz?quizId=${currentQuizId}&answers=${answersStr}`;
+        
+        console.log('Submitting quiz to URL:', url);
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': token
+                // No Content-Type header needed for URL parameters
+            }
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Submit response:', result);
+            
+            if (result.success) {
+                alert(`Quiz submitted successfully! Score: ${result.score}%`);
+                loadPage('dashboard');
+            } else {
+                alert('Failed to submit quiz: ' + (result.message || 'Unknown error'));
+            }
+        } else {
+            const errorText = await response.text();
+            console.error('Submit error:', errorText);
+            alert('Failed to submit quiz: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Error submitting quiz:', error);
+        alert('Server error. Please try again.');
+    }
+}
+
+async function sendMessage() {
+    const input = document.getElementById('newMsg');
+    const message = input.value.trim();
+    
+    if (!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('token');
+        
+        // Encode the message properly for URL
+        const params = new URLSearchParams();
+        params.append('content', message);
+        params.append('recipientType', 'teacher');
+        
+        console.log('Sending message:', message);
+        
+        const response = await fetch('http://localhost:8080/api/messages/send', {
+            method: 'POST',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Message response:', result);
+            
+            if (result.success) {
+                input.value = '';
+                loadPage('messages'); // Reload messages to show new one
+            } else {
+                alert('Failed to send message: ' + result.message);
+            }
+        } else {
+            const errorText = await response.text();
+            console.error('Message error:', errorText);
+            alert('Failed to send message: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('Server error. Please try again.');
+    }
+}
+async function logout() {
+    try {
+        const token = localStorage.getItem('token');
+        await fetch('http://localhost:8080/api/logout', {
+            method: 'POST',
+            headers: { 'Authorization': token }
+        });
+    } catch(error) {
+        console.log('Logout error:', error);
+    }
+    
+    localStorage.clear();
+    window.location.href = 'index.html';
+}
+
+checkAuth();
+</script>
+</body>
+</html>
